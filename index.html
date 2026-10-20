@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>密码生成器</title>
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --bg-gray: #f2f3f5;
+            --text-dark: #333;
+            --text-gray: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--bg-gray);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: var(--text-gray);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+        }
+
+        .length-section {
+            margin-bottom: 30px;
+        }
+
+        .length-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .length-value {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 10px 0;
+        }
+        
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e5e5e5;
+            border-radius: 4px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .range-limits {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .options-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-gray);
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .password-display {
+            background: var(--bg-gray);
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            font-size: 20px;
+            color: var(--text-dark);
+            word-break: break-all;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>密码生成器</h1>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-target="random">随机</button>
+        <button class="tab-btn" data-target="memorable">容易记住</button>
+        <button class="tab-btn" data-target="pin">PIN</button>
+    </div>
+
+    <div class="length-section">
+        <div class="length-header">
+            <span>密码长度:</span>
+            <span class="length-value" id="lengthValue">16</span>
+        </div>
+        <input type="range" id="lengthSlider" min="6" max="64" value="16">
+        <div class="range-limits">
+            <span id="minLength">6</span>
+            <span id="maxLength">64</span>
+        </div>
+    </div>
+
+    <div class="options-section" id="options-random">
+        <div class="option-row">
+            <span>数字</span>
+            <label class="switch">
+                <input type="checkbox" id="opt-numbers" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="option-row">
+            <span>符号</span>
+            <label class="switch">
+                <input type="checkbox" id="opt-symbols" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="options-section hidden" id="options-memorable">
+        <div class="option-row">
+            <span>首字母大写</span>
+            <label class="switch">
+                <input type="checkbox" id="opt-capitalize" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="option-row">
+            <span>使用完整单词</span>
+            <label class="switch">
+                <input type="checkbox" id="opt-fullwords" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="password-display" id="passwordDisplay"></div>
+
+    <div class="action-buttons">
+        <button class="btn btn-primary" id="copyBtn">复制密码</button>
+        <button class="btn btn-primary" id="refreshBtn">刷新密码</button>
+    </div>
+</div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const lengthSlider = document.getElementById('lengthSlider');
+    const lengthValue = document.getElementById('lengthValue');
+    const minLengthLabel = document.getElementById('minLength');
+    const maxLengthLabel = document.getElementById('maxLength');
+    const optionsRandom = document.getElementById('options-random');
+    const optionsMemorable = document.getElementById('options-memorable');
+    const passwordDisplay = document.getElementById('passwordDisplay');
+    const copyBtn = document.getElementById('copyBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    let currentMode = 'random';
+
+    const CHARS_LOWER = 'abcdefghijklmnopqrstuvwxyz';
+    const CHARS_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const CHARS_NUMBERS = '0123456789';
+    const CHARS_SYMBOLS = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    const CHARS_WORDS = ['apple', 'banana', 'cherry', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'india', 'juliet', 'kilo', 'lima', 'mike', 'november', 'oscar', 'papa', 'quebec', 'romeo', 'sierra', 'tango', 'uniform', 'victor', 'whiskey', 'xray', 'yankee', 'zulu'];
+
+    const modeConfig = {
+        random: { min: 6, max: 64, default: 16 },
+        memorable: { min: 2, max: 8, default: 4 },
+        pin: { min: 4, max: 12, default: 6 }
+    };
+
+    function init() {
+        updateSliderLimits('random');
+        generatePassword();
+        setupEventListeners();
+    }
+
+    function setupEventListeners() {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentMode = tab.getAttribute('data-target');
+                updateUIForMode();
+            });
+        });
+
+        lengthSlider.addEventListener('input', (e) => {
+            lengthValue.textContent = e.target.value;
+            generatePassword();
+        });
+
+        refreshBtn.addEventListener('click', generatePassword);
+
+        // 修复后的复制功能
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = passwordDisplay.textContent;
+            if (!textToCopy || textToCopy === '请选择字符类型') return;
+            
+            // 首选现代 Clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopyTextToClipboard(textToCopy));
+            } else {
+                // 本地双击打开 (file://) 时，降级使用传统方法
+                fallbackCopyTextToClipboard(textToCopy);
+            }
+        });
+
+        document.querySelectorAll('.switch input').forEach(checkbox => {
+            checkbox.addEventListener('change', generatePassword);
+        });
+    }
+
+    // 复制成功提示
+    function showSuccess() {
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '已复制!';
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+        }, 1500);
+    }
+
+    // 降级复制方案（兼容本地文件）
+    function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        
+        // 防止在复制时页面跳动
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+            if(successful) {
+                showSuccess();
+            } else {
+                alert('复制失败，请手动选中复制');
+            }
+        } catch (err) {
+            alert('浏览器不支持自动复制，请长按/选中密码手动复制');
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    function updateSliderLimits(mode) {
+        const config = modeConfig[mode];
+        lengthSlider.min = config.min;
+        lengthSlider.max = config.max;
+        lengthSlider.value = config.default;
+        lengthValue.textContent = config.default;
+        minLengthLabel.textContent = config.min;
+        maxLengthLabel.textContent = config.max;
+    }
+
+    function updateUIForMode() {
+        updateSliderLimits(currentMode);
+        optionsRandom.classList.add('hidden');
+        optionsMemorable.classList.add('hidden');
+        
+        if (currentMode === 'random') {
+            optionsRandom.classList.remove('hidden');
+        } else if (currentMode === 'memorable') {
+            optionsMemorable.classList.remove('hidden');
+        }
+
+        generatePassword();
+    }
+
+    function generatePassword() {
+        const length = parseInt(lengthSlider.value);
+        let password = '';
+
+        if (currentMode === 'random') {
+            let charset = CHARS_LOWER + CHARS_UPPER;
+            if (document.getElementById('opt-numbers').checked) charset += CHARS_NUMBERS;
+            if (document.getElementById('opt-symbols').checked) charset += CHARS_SYMBOLS;
+
+            if (charset === '') {
+                password = '请选择字符类型';
+            } else {
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * charset.length);
+                    password += charset[randomIndex];
+                }
+            }
+        } 
+        else if (currentMode === 'memorable') {
+            const isCapitalize = document.getElementById('opt-capitalize').checked;
+            const isFullWords = document.getElementById('opt-fullwords').checked;
+            let words = [];
+
+            for (let i = 0; i < length; i++) {
+                let word;
+                if (isFullWords) {
+                    word = CHARS_WORDS[Math.floor(Math.random() * CHARS_WORDS.length)];
+                } else {
+                    let combo = '';
+                    const wordLen = Math.floor(Math.random() * 4) + 5;
+                    for (let j = 0; j < wordLen; j++) {
+                        combo += CHARS_LOWER[Math.floor(Math.random() * CHARS_LOWER.length)];
+                    }
+                    word = combo;
+                }
+                
+                if (isCapitalize) {
+                    word = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                words.push(word);
+            }
+            password = words.join(' - ');
+        } 
+        else if (currentMode === 'pin') {
+            for (let i = 0; i < length; i++) {
+                password += CHARS_NUMBERS[Math.floor(Math.random() * CHARS_NUMBERS.length)];
+            }
+        }
+
+        passwordDisplay.textContent = password;
+    }
+
+    init();
+</script>
+</body>
+</html>
